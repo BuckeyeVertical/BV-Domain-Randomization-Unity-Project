@@ -11,9 +11,9 @@ public class ObjectSpawner : MonoBehaviour
     // Gets size of the road in Vector3 coordinates.
     private Vector3 roadSize;
     // Minimum number of objects to be generated
-    private int minObjects = 200;
+    private int minObjects = 4;
     // Maximum number of objects to be generated
-    private int maxObjects = 300;
+    private int maxObjects = 5;
     private int gridRows = 5;
     private int gridColumns = 3;
     private float gridCellWidth;
@@ -40,8 +40,8 @@ public class ObjectSpawner : MonoBehaviour
             {0,0.6f},
             {1,0.6f},
             {2,0.6f},
-            {3,4.6f}, // Y Offset for bikes
-            {4,0.6f}
+            // {3,4.6f}, // Y Offset for bikes
+            // {4,0.6f}
         };
         // Start the coroutine to spawn objects every 5 seconds
         StartCoroutine(SpawnObjectsEveryFiveSeconds());
@@ -52,7 +52,7 @@ public class ObjectSpawner : MonoBehaviour
         while (true)
         {
             SpawnObjects();  // Place the objects
-            yield return new WaitForSeconds(1000f);  // Wait for 5 seconds before placing again
+            yield return new WaitForSeconds(5f);  // Wait for 5 seconds before placing again
         }
     }
 
@@ -119,20 +119,7 @@ public class ObjectSpawner : MonoBehaviour
         newObject.transform.parent = transform;  // Set as child to maintain hierarchy
 
         Renderer objectRenderer = newObject.GetComponent<Renderer>();
-        if (objectRenderer != null)
-        {
-            Bounds bounds = objectRenderer.bounds;
-            float width = bounds.size.x;
-            float height = bounds.size.y;
-            float depth = bounds.size.z;
-
-            // Store or log bounding box information
-            Debug.Log("Bounding Box Width: " + width);
-            Debug.Log("Bounding Box Height: " + height);
-            Debug.Log("Bounding Box Depth: " + depth);
-
-            // You could store this data in a structure, array, or file depending on your needs
-        }
+        
         Debug.Log("Through");
         // Add position to the grid container
         gridContainers[gridIndex].Add(spawnPosition);
