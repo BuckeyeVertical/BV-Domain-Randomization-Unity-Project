@@ -37,11 +37,11 @@ public class ObjectSpawner : MonoBehaviour
             gridContainers[i] = new List<Vector3>();
         }
         objectOffsets = new Dictionary<int, float>{
-            {0,0.6f},
-            {1,0.6f},
-            {2,0.6f},
+            {0,-0.27f}, // Y Offset for football
+            {1,0.4f}, // Y Offset for basketball
+            {2,-0.9f}, // Y Offset for baseball
             {3,4.6f}, // Y Offset for bikes
-            {4,0.6f}
+            {4,0.6f}, // Y Offset for stop sign (no pole)
         };
         // Start the coroutine to spawn objects every 5 seconds
         StartCoroutine(SpawnObjectsEveryFiveSeconds());
@@ -52,7 +52,7 @@ public class ObjectSpawner : MonoBehaviour
         while (true)
         {
             SpawnObjects();  // Place the objects
-            yield return new WaitForSeconds(5f);  // Wait for 5 seconds before placing again
+            yield return new WaitForSeconds(1000f);  // Wait for 5 seconds before placing again
         }
     }
 
@@ -157,3 +157,4 @@ public class ObjectSpawner : MonoBehaviour
         return new Vector3(gridCenter.x + randomOffsetX, gridCenter.y, gridCenter.z + randomOffsetZ);
     }
 }
+
