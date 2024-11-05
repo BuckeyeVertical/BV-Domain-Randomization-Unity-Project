@@ -11,9 +11,9 @@ public class ObjectSpawner : MonoBehaviour
     // Gets size of the road in Vector3 coordinates.
     private Vector3 roadSize;
     // Minimum number of objects to be generated
-    private int minObjects = 4;
+    private int minObjects = 20;
     // Maximum number of objects to be generated
-    private int maxObjects = 5;
+    private int maxObjects = 30;
     private int gridRows = 5;
     private int gridColumns = 3;
     private float gridCellWidth;
@@ -40,7 +40,7 @@ public class ObjectSpawner : MonoBehaviour
             {0,0.6f},
             {1,0.6f},
             {2,0.6f},
-            // {3,4.6f}, // Y Offset for bikes
+            {3,4.6f}, // Y Offset for bikes
             // {4,0.6f}
         };
         // Start the coroutine to spawn objects every 5 seconds

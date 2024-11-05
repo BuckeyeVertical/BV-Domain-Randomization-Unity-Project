@@ -10,9 +10,10 @@ public class CameraScript : MonoBehaviour
     private Camera cam;
     private System.Random rnd;
 
+    
     public GameObject objectSpawner;
     public static int picturesTaken = 0;
-    public static int counter = 0;
+    
     readonly public static int totalpics = 3;
     readonly private Vector2 AspectRatio = new Vector2(1920, 1080);
 
@@ -66,28 +67,30 @@ public class CameraScript : MonoBehaviour
         cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
     }
 
-    private GameObject[] validTargets()
+    private (GameObject gameObject, Bounds bounds)[] validTargets()
     {
-        List<GameObject> validTargetsList = new List<GameObject>();
+        List<(GameObject gameObject, Bounds bounds)> validTargetsList = new List<(GameObject gameObject, Bounds bounds)>();
+        
         if(!(objectSpawner.transform.childCount == 0))
         {
             foreach(Transform obj in objectSpawner.transform)
             {
                 GameObject go = obj.gameObject;
-                if(isInView(go))
+                Bounds go2 = CalculateCombinedBounds(go);
+                if(isInView(go2))
                 {
-                    validTargetsList.Add(go);
+                    validTargetsList.Add((go, go2));
                 }
             }
 
             
         }
-        return validTargetsList.ToArray();;
+        return validTargetsList.ToArray();
     }
 
-    private bool isInView(GameObject obj)
+    private bool isInView(Bounds b)
     {
-        Vector3 pointOnScreen = cam.WorldToScreenPoint(obj.GetComponent<Renderer>().bounds.center);
+        Vector3 pointOnScreen = cam.WorldToScreenPoint(b.center);
 
         //Check object is not behind cam
         //Should never really happen unless camera is in bad spot
@@ -125,14 +128,14 @@ public class CameraScript : MonoBehaviour
 
 
     //Returns a string comprised of all payload object's class, normalized x and y value, and normalized width and height
-    private string GenerateNormalizedDataString(GameObject[] validObjects)
+    private string GenerateNormalizedDataString((GameObject gameObject, Bounds bounds)[] validObjects)
     {
         string dataString = "";
 
-        foreach (GameObject obj in validObjects)
+        foreach (var (obj, b) in validObjects)
         {
-            Vector2 centerPos = GetCenterPosition(obj);
-            Vector2 widthHeight = GetWidthHeight(obj);
+            Vector2 centerPos = GetCenterPosition(b);
+            Vector2 widthHeight = GetWidthHeight(b);
 
             dataString += normalize(centerPos.x, AspectRatio.x).ToString() + " " +
                         normalize(centerPos.y, AspectRatio.y).ToString() + " " +
@@ -144,35 +147,59 @@ public class CameraScript : MonoBehaviour
     }
 
 
-    private Vector2 GetCenterPosition(GameObject obj)
+    private Vector2 GetCenterPosition(Bounds b)
     {
         // Vector2 temp = cam.WorldToScreenPoint(obj.transform.position);
         // Vector2 centerPos = new Vector2(temp.x, AspectRatio.y - temp.y);
-        Renderer renderer = obj.GetComponent<Renderer>();
-        Bounds b = renderer.bounds;
+        // Renderer renderer = obj.GetComponent<Renderer>();
+        // Bounds b = renderer.bounds;
         Vector2 center = cam.WorldToScreenPoint(b.center);
-        return center;
+        float x = (float)center.x;
+        float y = AspectRatio.y - center.y;
+        return new Vector2(x,y);
     }
     //Returns width and height of a  gameobject as a Vector2 Object
-    private Vector2 GetWidthHeight(GameObject obj)
+    private Vector2 GetWidthHeight(Bounds b)
     {
-        Renderer rend = obj.GetComponent<Renderer>();
+        // Renderer rend = obj.GetComponent<Renderer>();
 
-        if(rend == null)
-        {
-            Debug.LogWarning("Renderer not found on object!");
-            return Vector2.zero;
-        }
+        // if(rend == null)
+        // {
+        //     Debug.LogWarning("Renderer not found on object!");
+        //     return Vector2.zero;
+        // }
 
-        Bounds b = GetComponent<Renderer>().bounds;
+        // Bounds b = GetComponent<Renderer>().bounds;
 
         Vector2 minScreenPoint = cam.WorldToScreenPoint(b.min);
         Vector2 maxScreenPoint = cam.WorldToScreenPoint(b.max);
 
+        minScreenPoint.y = AspectRatio.y - minScreenPoint.y;
+        maxScreenPoint.y = AspectRatio.y - maxScreenPoint.y;
+
         float width = Mathf.Abs(maxScreenPoint.x - minScreenPoint.x);
         float height = Mathf.Abs(maxScreenPoint.y - minScreenPoint.y);
         return new Vector2(width,height);
-    }   
+    } 
+
+    private Bounds CalculateCombinedBounds(GameObject obj)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+
+        if(renderers.Length == 0)
+        {
+            return new Bounds(Vector3.zero, Vector3.zero);
+        }
+
+        Bounds combinedBounds = renderers[0].bounds;
+
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            combinedBounds.Encapsulate(renderers[i].bounds);
+        }
+
+        return combinedBounds;
+    }
     //Normalize method
     public float normalize(float value, float total)
     {
@@ -196,7 +223,7 @@ public class CameraScript : MonoBehaviour
             {
                 randomizeSun();
                 randomizeCamera();
-                GameObject[] targets = validTargets();
+                (GameObject gameObject, Bounds bounds)[] targets = validTargets();
                 if(targets.Length > 0){
 
                     string textToWrite = GenerateNormalizedDataString(targets);
