@@ -706,6 +706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sun: {fileID: 705507993}
+  spawn: {fileID: 1755071322}
   objectSpawner: {fileID: 1755071321}
 --- !u!1 &1006935477
 GameObject:
@@ -956,6 +957,7 @@ MonoBehaviour:
   - {fileID: 3978156976444542998, guid: a8b1655a90145094bbbfdb3ddd350367, type: 3}
   - {fileID: 7441440908871300343, guid: 052f0d9a551166b458c44593c6566808, type: 3}
   - {fileID: 3169090002416453430, guid: 9b087ad3ee72dbd408584ba96bc2cc57, type: 3}
+  - {fileID: 6669599918551377397, guid: 1539865e7e6633d48ae273348fe7f433, type: 3}
   road: {fileID: 609622170}
 --- !u!4 &1755071323
 Transform:

@@ -10,11 +10,11 @@ public class CameraScript : MonoBehaviour
     private Camera cam;
     private System.Random rnd;
 
-    
+    public ObjectSpawner spawn;
     public GameObject objectSpawner;
     public static int picturesTaken = 0;
     
-    readonly public static int totalpics = 3;
+    readonly public static int totalpics = 10;
     readonly private Vector2 AspectRatio = new Vector2(1920, 1080);
 
     const string workingDirectory = "D:\\Data\\Buckeye Vertical\\Image Classifier";
@@ -26,11 +26,9 @@ public class CameraScript : MonoBehaviour
     private int fileCount = 0;
     private int prevFileCount = 0;
 
-    private int totalObjects = 9216;
     private int fileCountConstant = 0;
 
     //CHANGE THIS!!
-    private int numPayloads = 8;
 
     private int prevPicTaken = -1;
 
@@ -62,9 +60,9 @@ public class CameraScript : MonoBehaviour
         float z = rnd.Next(-25, 25);
         cam.transform.localPosition = new Vector3(x, y, z);
 
-        float rotation_y = rnd.Next(0, 359);
-        float rotation_x = rnd.Next(90, 90);
-        cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
+        // float rotation_y = rnd.Next(0, 359);
+        // float rotation_x = rnd.Next(90, 90);
+        // cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
     }
 
     private (GameObject gameObject, Bounds bounds)[] validTargets()
@@ -171,8 +169,12 @@ public class CameraScript : MonoBehaviour
 
         // Bounds b = GetComponent<Renderer>().bounds;
 
-        Vector2 minScreenPoint = cam.WorldToScreenPoint(b.min);
-        Vector2 maxScreenPoint = cam.WorldToScreenPoint(b.max);
+        Vector3 minXZ = new Vector3(b.min.x, 0, b.min.z);
+        Vector3 maxXZ = new Vector3(b.max.x, 0, b.max.z);
+
+        // Convert these modified min and max points to screen space
+        Vector2 minScreenPoint = cam.WorldToScreenPoint(minXZ);
+        Vector2 maxScreenPoint = cam.WorldToScreenPoint(maxXZ);
 
         minScreenPoint.y = AspectRatio.y - minScreenPoint.y;
         maxScreenPoint.y = AspectRatio.y - maxScreenPoint.y;
@@ -211,6 +213,7 @@ public class CameraScript : MonoBehaviour
     {
         rnd = new System.Random();
         cam = GetComponent<Camera>();
+        // spawn.SpawnObjects();
     }
 
 
@@ -219,8 +222,6 @@ public class CameraScript : MonoBehaviour
     {
 
         if (picturesTaken <= totalpics){
-            if(!swapPage)
-            {
                 randomizeSun();
                 randomizeCamera();
                 (GameObject gameObject, Bounds bounds)[] targets = validTargets();
@@ -259,30 +260,10 @@ public class CameraScript : MonoBehaviour
                         picturesTaken++;
                     }
                 }
-            }
-            else
-            {
-                swapRoad = false;
-                Debug.Log(swapRoad);
-                swapPage = false;
-            }
         }
         else
         {
-            //If the current fileCount is less than the 0-indexed final number of iterations
-            if(fileCount < (totalObjects/numPayloads)-1)
-            {
-                fileCount++;
-                swapRoad = true;
-                Debug.Log(swapRoad);
-                swapPage = true;
-                picturesTaken = 0;
-            }
-            else
-            {
-                Debug.Log("Execution Finished");
-                return;
-            }
+            // spawn.SpawnObjects();
         }
     }
 

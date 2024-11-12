@@ -11,9 +11,9 @@ public class ObjectSpawner : MonoBehaviour
     // Gets size of the road in Vector3 coordinates.
     private Vector3 roadSize;
     // Minimum number of objects to be generated
-    private int minObjects = 20;
+    private int minObjects = 100;
     // Maximum number of objects to be generated
-    private int maxObjects = 30;
+    private int maxObjects = 200;
     private int gridRows = 5;
     private int gridColumns = 3;
     private float gridCellWidth;
@@ -56,7 +56,7 @@ public class ObjectSpawner : MonoBehaviour
         }
     }
 
-    private void SpawnObjects()
+    public void SpawnObjects()
     {
         // Clear previous objects and grid containers
         foreach (Transform child in transform)
