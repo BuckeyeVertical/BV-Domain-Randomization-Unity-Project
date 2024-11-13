@@ -11,9 +11,9 @@ public class ObjectSpawner : MonoBehaviour
     // Gets size of the road in Vector3 coordinates.
     private Vector3 roadSize;
     // Minimum number of objects to be generated
-    private int minObjects = 200;
+    private int minObjects = 100;
     // Maximum number of objects to be generated
-    private int maxObjects = 300;
+    private int maxObjects = 200;
     private int gridRows = 5;
     private int gridColumns = 3;
     private float gridCellWidth;
@@ -22,6 +22,35 @@ public class ObjectSpawner : MonoBehaviour
 
     private Dictionary<int, List<Vector3>> gridContainers;
     private Dictionary<int, float> objectOffsets;
+    private Dictionary<int, List<(Vector3 rotation, float yOffset)>> objectRotations = new Dictionary<int, List<(Vector3, float)>> 
+    {
+        {0, new List<(Vector3, float)> { //footballs
+            (new Vector3(0, 0, 0), 0f),
+            (new Vector3(0, 45, 0), 0f),
+            (new Vector3(0, 90, 0), 0f),
+            (new Vector3(0, 135, 0), 0f),
+            (new Vector3(0, 180, 0), 0f),
+            (new Vector3(0, 225, 0), 0f),
+            (new Vector3(0, 270, 0), 0f),
+            (new Vector3(0, 315, 0), 0f)
+        }},
+        {3, new List<(Vector3, float)> { //bikes
+            (new Vector3(65, 40, 0), 2.9f),
+            (new Vector3(-65, 90, 0), 2.9f),
+            (new Vector3(78, 135, 0), 2.9f),
+            //(new Vector3(-78, 180, 0), 2.9f),
+            (new Vector3(25, 220, 0), 4.5f),
+            (new Vector3(-25, 270, 0), 4.5f)
+        }},
+        {4, new List<(Vector3, float)> { //stop-sign
+            (new Vector3(85, 90, 40), 0.1f),
+            (new Vector3(-45, 130, 66), 0.1f),
+            (new Vector3(50, 160, 12), 0.1f),
+            (new Vector3(65, 45, 25), 0.1f),
+            (new Vector3(-35, 10, 18), 0.1f)
+        }}
+    };
+
     void Start()
     {
         roadSize = road.GetComponent<Renderer>().bounds.size;
@@ -37,12 +66,31 @@ public class ObjectSpawner : MonoBehaviour
             gridContainers[i] = new List<Vector3>();
         }
         objectOffsets = new Dictionary<int, float>{
-            {0,0.6f},
-            {1,0.6f},
-            {2,0.6f},
+            {0,-0.27f}, // Y Offset for football
+            {1,0.4f}, // Y Offset for basketball
+            {2,-0.9f}, // Y Offset for baseball
             {3,4.6f}, // Y Offset for bikes
-            {4,0.6f}
+            {4,0.6f}, // Y Offset for stop sign (no pole)
         };
+
+        //  objectRotations = new Dictionary<int, List<(Vector3 rotation, float yOffset)>> {
+        //     {3, new List<(Vector3, float)> {
+        //         (new Vector3(65, 0, 0), 2.9f),
+        //         (new Vector3(-65, 0, 0), 2.9f),
+        //         (new Vector3(78, 0, 0), 2.9f),
+        //         (new Vector3(-78, 0, 0), 2.9f),
+        //         (new Vector3(25, 0, 0), 5.7f),
+        //         (new Vector3(-25, 0, 0), 5.7f)
+        //     }},
+        //     {4, new List<(Vector3, float)> {
+        //         (new Vector3(85, 90, 40), 0.1f),
+        //         (new Vector3(-45, 130, 66), 0.1f),
+        //         (new Vector3(50, 160, 12), 0.1f),
+        //         (new Vector3(65, 45, 25), 0.1f),
+        //         (new Vector3(-35, 10, 18), 0.1f)
+        //     }}
+        // };
+
         // Start the coroutine to spawn objects every 5 seconds
         StartCoroutine(SpawnObjectsEveryFiveSeconds());
     }
@@ -56,7 +104,7 @@ public class ObjectSpawner : MonoBehaviour
         }
     }
 
-    private void SpawnObjects()
+    public void SpawnObjects()
     {
         // Clear previous objects and grid containers
         foreach (Transform child in transform)
@@ -112,30 +160,45 @@ public class ObjectSpawner : MonoBehaviour
                 }
             }
         }
-        spawnPosition.y += objectOffsets[randomIndex]; // Applied Y-offset
 
-        // Place object at the valid, non-overlapping position
-        GameObject newObject = Instantiate(selectedObject, spawnPosition, Quaternion.identity);
-        newObject.transform.parent = transform;  // Set as child to maintain hierarchy
-
-        Renderer objectRenderer = newObject.GetComponent<Renderer>();
-        if (objectRenderer != null)
+        // Get rotation and y-offset if available in the dictionary
+        Quaternion rotation = Quaternion.identity;
+        float yOffset = objectOffsets.ContainsKey(randomIndex) ? objectOffsets[randomIndex] : 0f;
+        
+        if (objectRotations.ContainsKey(randomIndex))
         {
-            Bounds bounds = objectRenderer.bounds;
-            float width = bounds.size.x;
-            float height = bounds.size.y;
-            float depth = bounds.size.z;
-
-            // Store or log bounding box information
-            Debug.Log("Bounding Box Width: " + width);
-            Debug.Log("Bounding Box Height: " + height);
-            Debug.Log("Bounding Box Depth: " + depth);
-
-            // You could store this data in a structure, array, or file depending on your needs
+            var rotations = objectRotations[randomIndex];
+            var chosenRotation = rotations[Random.Range(0, rotations.Count)];
+            rotation = Quaternion.Euler(chosenRotation.rotation);
+            yOffset = chosenRotation.yOffset;
         }
-        Debug.Log("Through");
-        // Add position to the grid container
+
+        spawnPosition.y += yOffset;
+        GameObject newObject = Instantiate(selectedObject, spawnPosition, rotation);
+        newObject.transform.parent = transform;
+
         gridContainers[gridIndex].Add(spawnPosition);
+
+        ///////////
+        
+        // Renderer objectRenderer = newObject.GetComponent<Renderer>();
+        // if (objectRenderer != null)
+        // {
+        //     Bounds bounds = objectRenderer.bounds;
+        //     float width = bounds.size.x;
+        //     float height = bounds.size.y;
+        //     float depth = bounds.size.z;
+
+        //     // Store or log bounding box information
+        //     Debug.Log("Bounding Box Width: " + width);
+        //     Debug.Log("Bounding Box Height: " + height);
+        //     Debug.Log("Bounding Box Depth: " + depth);
+
+        //     // You could store this data in a structure, array, or file depending on your needs
+        // }
+        // Debug.Log("Through");
+        // // Add position to the grid container
+        // gridContainers[gridIndex].Add(spawnPosition);
     }
 
     private Vector3 GetGridCenter(int gridIndex)

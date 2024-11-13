@@ -10,28 +10,25 @@ public class CameraScript : MonoBehaviour
     private Camera cam;
     private System.Random rnd;
 
+    public ObjectSpawner spawn;
+    public GameObject objectSpawner;
     public static int picturesTaken = 0;
-    public static int counter = 0;
-    readonly public static int totalpics = 3;
+    
+    readonly public static int totalpics = 10;
     readonly private Vector2 AspectRatio = new Vector2(1920, 1080);
 
     const string workingDirectory = "D:\\Data\\Buckeye Vertical\\Image Classifier";
     //const string workingDirectory = "U:\\Prelim Detection Dataset";
 
-    public PayloadTargetContents[] payloadTargets;
-    public PayloadTargetContents[] payloadTargets2;
-    public GameObject road;
     public static Boolean swapPage = false;
     public static Boolean swapRoad = false;
 
     private int fileCount = 0;
     private int prevFileCount = 0;
 
-    private int totalObjects = 9216;
     private int fileCountConstant = 0;
 
     //CHANGE THIS!!
-    private int numPayloads = 8;
 
     private int prevPicTaken = -1;
 
@@ -63,88 +60,80 @@ public class CameraScript : MonoBehaviour
         float z = rnd.Next(-25, 25);
         cam.transform.localPosition = new Vector3(x, y, z);
 
-        float rotation_y = rnd.Next(0, 359);
-        float rotation_x = rnd.Next(90, 90);
-        cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
+        // float rotation_y = rnd.Next(0, 359);
+        // float rotation_x = rnd.Next(90, 90);
+        // cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
     }
 
-
-
-    //Returns a boolean, which verifies if all objects were successfully placed on screen, and not overlapping
-    private bool RandomizeAndVerifyTargets()
+    private (GameObject gameObject, Bounds bounds)[] validTargets()
     {
-        bool notFailed = true;
-
-        List<Vector3> placedPositions = new List<Vector3>(); // To store positions of placed objects
-
-        foreach (PayloadTargetContents targetContent in payloadTargets)
+        List<(GameObject gameObject, Bounds bounds)> validTargetsList = new List<(GameObject gameObject, Bounds bounds)>();
+        
+        if(!(objectSpawner.transform.childCount == 0))
         {
-            bool isPositionValid = false;
-            int attempts = 0;
-            int maxAttempts = 10000; // Set a maximum number of attempts to prevent infinite loops
-
-            while (!isPositionValid && attempts < maxAttempts)
+            foreach(Transform obj in objectSpawner.transform)
             {
-                // Randomize position
-                Vector3 newPosition = GetRandomPosition();
-                targetContent.target.transform.localPosition = newPosition;
-
-                // Check if in view
-                Vector3 screenPos = cam.WorldToViewportPoint(targetContent.target.transform.position);
-                bool inView = screenPos.x >= 0 && screenPos.x <= 1 && screenPos.y >= 0 && screenPos.y <= 1 && screenPos.z > 0;
-
-                // Check for overlaps
-                bool isOverlapping = placedPositions.Any(pos => Vector3.Distance(newPosition, pos) < 50f);
-
-                // Update position validity
-                isPositionValid = inView && !isOverlapping;
-
-                if (isPositionValid)
+                GameObject go = obj.gameObject;
+                Bounds go2 = CalculateCombinedBounds(go);
+                if(isInView(go2))
                 {
-                    // Randomize rotation
-                    float rotation_y = rnd.Next(0, 359);
-                    targetContent.target.transform.localRotation = Quaternion.Euler(0, rotation_y, 2);
-
-                    placedPositions.Add(newPosition); // Add this position to the list
+                    validTargetsList.Add((go, go2));
                 }
-
-                attempts++;
             }
 
-            if (attempts >= maxAttempts)
-            {
-                notFailed = false;
-                //Debug.LogWarning("Max attempts reached for object placement. Last position may not be ideal.");
-            }
+            
         }
-        return notFailed;
+        return validTargetsList.ToArray();
     }
 
-    private Vector3 GetRandomPosition()
+    private bool isInView(Bounds b)
     {
-        float x = rnd.Next(-150, 200); //rnd.Next(-72, 106);
-        float z = rnd.Next(-150, 200); //rnd.Next(-73, 60);
-        return new Vector3(x, 3.0f, z);
+        Vector3 pointOnScreen = cam.WorldToScreenPoint(b.center);
+
+        //Check object is not behind cam
+        //Should never really happen unless camera is in bad spot
+        if (pointOnScreen.z < 0)
+        {
+            return false;
+        }
+
+        //Check object is in field of view
+        if ((pointOnScreen.x < 0) || (pointOnScreen.x > Screen.width) ||
+        (pointOnScreen.y < 0) || (pointOnScreen.y > Screen.height))
+        {
+            return false;
+        }
+        // In case objects cover each other
+        // RaycastHit hit;
+        // Vector3 heading = toCheck.transform.position - origin.transform.position;
+        // Vector3 direction = heading.normalized;// / heading.magnitude;
+        
+        // if (Physics.Linecast(cam.transform.position, toCheck.GetComponentInChildren<Renderer>().bounds.center, out hit))
+        // {
+        //     if (hit.transform.name != toCheck.name)
+        //     {
+        //         /* -->
+        //         Debug.DrawLine(cam.transform.position, toCheck.GetComponentInChildren<Renderer>().bounds.center, Color.red);
+        //         Debug.LogError(toCheck.name + " occluded by " + hit.transform.name);
+        //         */
+        //         Debug.Log(toCheck.name + " occluded by " + hit.transform.name);
+        //         return false;
+        //     }
+        // }
+        return true;
     }
+
 
 
     //Returns a string comprised of all payload object's class, normalized x and y value, and normalized width and height
-    private string GenerateNormalizedDataString()
+    private string GenerateNormalizedDataString((GameObject gameObject, Bounds bounds)[] validObjects)
     {
         string dataString = "";
 
-        foreach (PayloadTargetContents payload in payloadTargets)
+        foreach (var (obj, b) in validObjects)
         {
-            int materialClass;
-            Renderer targetRenderer = payload.target.GetComponent<Renderer>();
-            if (targetRenderer != null && targetRenderer.material != null)
-            {
-                string materialName = targetRenderer.material.name;
-                materialClass = GetMaterialClass(materialName);
-                dataString += materialClass + " ";
-            }
-            Vector2 centerPos = GetCenterPosition(payload.target);
-            Vector2 widthHeight = GetWidthHeight(payload);
+            Vector2 centerPos = GetCenterPosition(b);
+            Vector2 widthHeight = GetWidthHeight(b);
 
             dataString += normalize(centerPos.x, AspectRatio.x).ToString() + " " +
                         normalize(centerPos.y, AspectRatio.y).ToString() + " " +
@@ -155,78 +144,68 @@ public class CameraScript : MonoBehaviour
         return dataString;
     }
 
-    //Gets material class give a 4 digit string
-    int GetMaterialClass(string materialName)
+
+    private Vector2 GetCenterPosition(Bounds b)
     {
-        if (!string.IsNullOrEmpty(materialName) && materialName.Length >= 2)
+        // Vector2 temp = cam.WorldToScreenPoint(obj.transform.position);
+        // Vector2 centerPos = new Vector2(temp.x, AspectRatio.y - temp.y);
+        // Renderer renderer = obj.GetComponent<Renderer>();
+        // Bounds b = renderer.bounds;
+        Vector2 center = cam.WorldToScreenPoint(b.center);
+        float x = (float)center.x;
+        float y = AspectRatio.y - center.y;
+        return new Vector2(x,y);
+    }
+    //Returns width and height of a  gameobject as a Vector2 Object
+    private Vector2 GetWidthHeight(Bounds b)
+    {
+        // Renderer rend = obj.GetComponent<Renderer>();
+
+        // if(rend == null)
+        // {
+        //     Debug.LogWarning("Renderer not found on object!");
+        //     return Vector2.zero;
+        // }
+
+        // Bounds b = GetComponent<Renderer>().bounds;
+
+        Vector3 minXZ = new Vector3(b.min.x, 0, b.min.z);
+        Vector3 maxXZ = new Vector3(b.max.x, 0, b.max.z);
+
+        // Convert these modified min and max points to screen space
+        Vector2 minScreenPoint = cam.WorldToScreenPoint(minXZ);
+        Vector2 maxScreenPoint = cam.WorldToScreenPoint(maxXZ);
+
+        minScreenPoint.y = AspectRatio.y - minScreenPoint.y;
+        maxScreenPoint.y = AspectRatio.y - maxScreenPoint.y;
+
+        float width = Mathf.Abs(maxScreenPoint.x - minScreenPoint.x);
+        float height = Mathf.Abs(maxScreenPoint.y - minScreenPoint.y);
+        return new Vector2(width,height);
+    } 
+
+    private Bounds CalculateCombinedBounds(GameObject obj)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+
+        if(renderers.Length == 0)
         {
-            int shape = int.Parse(materialName.Substring(0, 1));
-            int color = int.Parse(materialName.Substring(1, 1));
-            return shape * 8 + color;  // Compute class index
+            return new Bounds(Vector3.zero, Vector3.zero);
         }
-        return -1;  // Return -1 or an appropriate value for invalid cases
-    }
 
-    private Vector2 GetCenterPosition(GameObject target)
-    {
-        Vector2 temp = cam.WorldToScreenPoint(target.transform.position);
-        Vector2 centerPos = new Vector2(temp.x, AspectRatio.y - temp.y);
-        return centerPos;
-    }
-    //Returns width and height of a payload object as a Vector2 Object
-    private Vector2 GetWidthHeight(PayloadTargetContents payload)
-    {
-        List<Vector2> corners = new List<Vector2>();
-        Vector2 temp = cam.WorldToScreenPoint(payload.TLTarget.transform.position);
-        corners.Add(new Vector2(temp.x, AspectRatio.y - temp.y));
-        temp = cam.WorldToScreenPoint(payload.BLTarget.transform.position);
-        corners.Add(new Vector2(temp.x, AspectRatio.y - temp.y));
-        temp = cam.WorldToScreenPoint(payload.TRTarget.transform.position);
-        corners.Add(new Vector2(temp.x, AspectRatio.y - temp.y));
-        temp = cam.WorldToScreenPoint(payload.BRTarget.transform.position);
-        corners.Add(new Vector2(temp.x, AspectRatio.y - temp.y));
+        Bounds combinedBounds = renderers[0].bounds;
 
-        Vector2 widthHeight = findWidthHeight(corners);
-        return widthHeight;
-    }   
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            combinedBounds.Encapsulate(renderers[i].bounds);
+        }
+
+        return combinedBounds;
+    }
     //Normalize method
     public float normalize(float value, float total)
     {
         return value / total;
-    }
-
-    //Returns Vector2 (width, height) given 4 coordinates
-    private Vector2 findWidthHeight(IList<Vector2> corners)
-    {
-        float highestX = float.MinValue;
-        float highestY = float.MinValue;
-        float lowestX = float.MaxValue;
-        float lowestY = float.MaxValue;
-
-        foreach (Vector2 vector in corners)
-        {
-            if (vector.x > highestX)
-            {
-                highestX = vector.x;
-            }
-
-            if (vector.y > highestY)
-            {
-                highestY = vector.y;
-            }
-
-            if (vector.x < lowestX)
-            {
-                lowestX = vector.x;
-            }
-
-            if (vector.y < lowestY)
-            {
-                lowestY = vector.y;
-            }
-        }
-
-        return new Vector2(highestX - lowestX, highestY - lowestY);
     }
 
     // Start is called before the first frame update
@@ -234,6 +213,7 @@ public class CameraScript : MonoBehaviour
     {
         rnd = new System.Random();
         cam = GetComponent<Camera>();
+        // spawn.SpawnObjects();
     }
 
 
@@ -242,12 +222,12 @@ public class CameraScript : MonoBehaviour
     {
 
         if (picturesTaken <= totalpics){
-            if(!swapPage)
-            {
                 randomizeSun();
                 randomizeCamera();
-                if(RandomizeAndVerifyTargets()){
-                    string textToWrite = GenerateNormalizedDataString();
+                (GameObject gameObject, Bounds bounds)[] targets = validTargets();
+                if(targets.Length > 0){
+
+                    string textToWrite = GenerateNormalizedDataString(targets);
                     string screenShotPath;
                     string filePath;
                     //Every four pictures sent to train set
@@ -280,30 +260,10 @@ public class CameraScript : MonoBehaviour
                         picturesTaken++;
                     }
                 }
-            }
-            else
-            {
-                swapRoad = false;
-                Debug.Log(swapRoad);
-                swapPage = false;
-            }
         }
         else
         {
-            //If the current fileCount is less than the 0-indexed final number of iterations
-            if(fileCount < (totalObjects/numPayloads)-1)
-            {
-                fileCount++;
-                swapRoad = true;
-                Debug.Log(swapRoad);
-                swapPage = true;
-                picturesTaken = 0;
-            }
-            else
-            {
-                Debug.Log("Execution Finished");
-                return;
-            }
+            // spawn.SpawnObjects();
         }
     }
 
