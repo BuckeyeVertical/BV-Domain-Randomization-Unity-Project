@@ -17,7 +17,8 @@ public class CameraScript : MonoBehaviour
     readonly public static int totalpics = 10;
     readonly private Vector2 AspectRatio = new Vector2(1920, 1080);
 
-    const string workingDirectory = "D:\\Data\\Buckeye Vertical\\Image Classifier";
+
+    const string workingDirectory = @"/Users/kylepark/Documents/Buckeye Vertical"; 
     //const string workingDirectory = "U:\\Prelim Detection Dataset";
 
     public static Boolean swapPage = false;
@@ -220,31 +221,34 @@ public class CameraScript : MonoBehaviour
     
     void Update()
     {
-
         if (picturesTaken <= totalpics){
                 randomizeSun();
                 randomizeCamera();
                 (GameObject gameObject, Bounds bounds)[] targets = validTargets();
+
                 if(targets.Length > 0){
 
                     string textToWrite = GenerateNormalizedDataString(targets);
                     string screenShotPath;
                     string filePath;
+
                     //Every four pictures sent to train set
                     if (picturesTaken % 5 != 0)
                     {
                         screenShotPath = workingDirectory + "\\train\\images\\" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".png";
-                        filePath = workingDirectory + "\\train\\labels\\" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".txt";
+                        filePath = workingDirectory + "/train/labels/" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".txt";
                     }
                     //Every fifth picture sent to validation set
                     else
                     {
                         screenShotPath = workingDirectory + "\\valid\\images\\" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".png";
-                        filePath = workingDirectory + "\\valid\\labels\\" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".txt";
+                        filePath = workingDirectory + "/valid/labels/" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".txt";
                     }
 
+                    Debug.Log(workingDirectory + "\\valid\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png");
+
                     if(File.Exists(workingDirectory + "\\train\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png") ||
-                    prevPicTaken == -1|| File.Exists(workingDirectory + "\\valid\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png"))
+                    (prevPicTaken >= -1) || File.Exists(workingDirectory + "\\valid\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png"))
                     {
                         // Create a new StreamWriter and write the text to the file
                         using (StreamWriter writer = new StreamWriter(filePath))
@@ -258,12 +262,14 @@ public class CameraScript : MonoBehaviour
                         prevFileCount = fileCount;
                         
                         picturesTaken++;
+                        
                     }
                 }
         }
         else
         {
             // spawn.SpawnObjects();
+            picturesTaken = -1;
         }
     }
 
