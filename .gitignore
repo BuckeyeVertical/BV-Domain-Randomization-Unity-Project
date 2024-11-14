@@ -8,9 +8,15 @@
 [Ll]ibrary/
 [Tt]emp/
 [Aa]ssets/Resources/
+[Aa]ssets/Resources.meta
+[Aa]ssets/Downloads/
+[Aa]ssets/Downloads.meta
+[Aa]ssets/Downloads.zip
+[Aa]ssets/Downloads.zip.meta
 [Tt]est[Bb]uild/
 [Tt]est[Bb]uilds/
 Assets/AssetStoreTools*
+[Ll]ogs/
 
 # Visual Studio Code
 .vscode/
