@@ -10,15 +10,14 @@ public class CameraScript : MonoBehaviour
     private Camera cam;
     private System.Random rnd;
 
-    public ObjectSpawner spawn;
     public GameObject objectSpawner;
     public static int picturesTaken = 0;
     
-    readonly public static int totalpics = 10;
+    readonly public static int totalpics = 100;
     readonly private Vector2 AspectRatio = new Vector2(1920, 1080);
 
 
-    const string workingDirectory = @"/Users/kylepark/Documents/Buckeye Vertical"; 
+    const string workingDirectory = @"D:\Data\Buckeye Vertical\Image Classifier"; 
     //const string workingDirectory = "U:\\Prelim Detection Dataset";
 
     public static Boolean swapPage = false;
@@ -27,8 +26,7 @@ public class CameraScript : MonoBehaviour
     private int fileCount = 0;
     private int prevFileCount = 0;
 
-    private int fileCountConstant = 0;
-
+    private Dictionary<string, int> objectClassMap;
     //CHANGE THIS!!
 
     private int prevPicTaken = -1;
@@ -78,6 +76,7 @@ public class CameraScript : MonoBehaviour
                 Bounds go2 = CalculateCombinedBounds(go);
                 if(isInView(go2))
                 {
+                    Debug.Log(go.name);
                     validTargetsList.Add((go, go2));
                 }
             }
@@ -136,7 +135,9 @@ public class CameraScript : MonoBehaviour
             Vector2 centerPos = GetCenterPosition(b);
             Vector2 widthHeight = GetWidthHeight(b);
 
-            dataString += normalize(centerPos.x, AspectRatio.x).ToString() + " " +
+            dataString += 
+                        GetObjectClass(obj).ToString() + " " +
+                        normalize(centerPos.x, AspectRatio.x).ToString() + " " +
                         normalize(centerPos.y, AspectRatio.y).ToString() + " " +
                         normalize(widthHeight.x, AspectRatio.x).ToString() + " " +
                         normalize(widthHeight.y, AspectRatio.y).ToString() + "\n";
@@ -180,11 +181,11 @@ public class CameraScript : MonoBehaviour
         minScreenPoint.y = AspectRatio.y - minScreenPoint.y;
         maxScreenPoint.y = AspectRatio.y - maxScreenPoint.y;
 
-        float width = Mathf.Abs(maxScreenPoint.x - minScreenPoint.x);
-        float height = Mathf.Abs(maxScreenPoint.y - minScreenPoint.y);
+        float width = Mathf.Abs(maxScreenPoint.x - minScreenPoint.x)*1.2f;
+        float height = Mathf.Abs(maxScreenPoint.y - minScreenPoint.y)*1.2f;
         return new Vector2(width,height);
     } 
-
+    //TO-DO: Write a formula based on the rotation of the object compared to the object to make it bigger
     private Bounds CalculateCombinedBounds(GameObject obj)
     {
         Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
@@ -202,6 +203,7 @@ public class CameraScript : MonoBehaviour
         }
 
         return combinedBounds;
+        
     }
     //Normalize method
     public float normalize(float value, float total)
@@ -209,12 +211,40 @@ public class CameraScript : MonoBehaviour
         return value / total;
     }
 
+    public int GetObjectClass(GameObject obj)
+    {
+        if (obj == null) return -1; // Return -1 for invalid objects
+
+        // Strip the "(Clone)" suffix from the object name
+        string objectName = obj.name.Replace("(Clone)", "").Trim();
+
+        // Look up the name in the dictionary
+        if (objectClassMap.TryGetValue(objectName, out int classNumber))
+        {
+            return classNumber;
+        }
+        else
+        {
+            Debug.LogWarning($"Object name '{objectName}' not found in the dictionary.");
+            return -1; // Return -1 if the name is not found
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         rnd = new System.Random();
         cam = GetComponent<Camera>();
-        // spawn.SpawnObjects();
+        // Initialize the dictionary with mappings
+        objectClassMap = new Dictionary<string, int>
+        {
+            { "Basketball", 0 },
+            { "Football", 1 },
+            { "BMXBikeE", 2 },
+            { "Sign_Stop", 3 },
+            { "Baseball", 4 },
+            // Add other objects as needed
+        };
     }
 
 
@@ -235,20 +265,20 @@ public class CameraScript : MonoBehaviour
                     //Every four pictures sent to train set
                     if (picturesTaken % 5 != 0)
                     {
-                        screenShotPath = workingDirectory + "\\train\\images\\" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".png";
-                        filePath = workingDirectory + "/train/labels/" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".txt";
+                        screenShotPath = workingDirectory + "\\train\\images\\" + picturesTaken.ToString() + ".png";
+                        filePath = workingDirectory + "/train/labels/" + picturesTaken.ToString() + ".txt";
                     }
                     //Every fifth picture sent to validation set
                     else
                     {
-                        screenShotPath = workingDirectory + "\\valid\\images\\" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".png";
-                        filePath = workingDirectory + "/valid/labels/" + (fileCount+fileCountConstant) + "_" + picturesTaken.ToString() + ".txt";
+                        screenShotPath = workingDirectory + "\\valid\\images\\"  + picturesTaken.ToString() + ".png";
+                        filePath = workingDirectory + "/valid/labels/" + picturesTaken.ToString() + ".txt";
                     }
 
-                    Debug.Log(workingDirectory + "\\valid\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png");
+                    // Debug.Log(workingDirectory + "\\valid\\images\\"  + prevPicTaken.ToString() + ".png");
 
-                    if(File.Exists(workingDirectory + "\\train\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png") ||
-                    (prevPicTaken >= -1) || File.Exists(workingDirectory + "\\valid\\images\\" + (prevFileCount + fileCountConstant) + "_" + prevPicTaken.ToString() + ".png"))
+                    if(File.Exists(workingDirectory + "\\train\\images\\"+ prevPicTaken.ToString() + ".png") ||
+                    (prevPicTaken == -1) || File.Exists(workingDirectory + "\\valid\\images\\"+ prevPicTaken.ToString() + ".png"))
                     {
                         // Create a new StreamWriter and write the text to the file
                         using (StreamWriter writer = new StreamWriter(filePath))
@@ -265,12 +295,17 @@ public class CameraScript : MonoBehaviour
                         
                     }
                 }
+            Debug.Log(picturesTaken);
+        }else{
+            Debug.Log("Reached max count. Exiting application...");
+            Application.Quit();
+
+            // If you're running in the Unity Editor, stop play mode
+            #if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+            #endif
         }
-        else
-        {
-            // spawn.SpawnObjects();
-            picturesTaken = -1;
-        }
+        
     }
 
     
