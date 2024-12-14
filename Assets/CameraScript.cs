@@ -59,9 +59,9 @@ public class CameraScript : MonoBehaviour
         float z = rnd.Next(-25, 25);
         cam.transform.localPosition = new Vector3(x, y, z);
 
-        // float rotation_y = rnd.Next(0, 359);
-        // float rotation_x = rnd.Next(90, 90);
-        // cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
+        float rotation_y = rnd.Next(0, 359);
+        float rotation_x = rnd.Next(90, 90);
+        cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
     }
 
     private (GameObject gameObject, Bounds bounds)[] validTargets()

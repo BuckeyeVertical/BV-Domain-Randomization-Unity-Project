@@ -73,23 +73,7 @@ public class ObjectSpawner : MonoBehaviour
             {4,0.6f}, // Y Offset for stop sign (no pole)
         };
 
-        //  objectRotations = new Dictionary<int, List<(Vector3 rotation, float yOffset)>> {
-        //     {3, new List<(Vector3, float)> {
-        //         (new Vector3(65, 0, 0), 2.9f),
-        //         (new Vector3(-65, 0, 0), 2.9f),
-        //         (new Vector3(78, 0, 0), 2.9f),
-        //         (new Vector3(-78, 0, 0), 2.9f),
-        //         (new Vector3(25, 0, 0), 5.7f),
-        //         (new Vector3(-25, 0, 0), 5.7f)
-        //     }},
-        //     {4, new List<(Vector3, float)> {
-        //         (new Vector3(85, 90, 40), 0.1f),
-        //         (new Vector3(-45, 130, 66), 0.1f),
-        //         (new Vector3(50, 160, 12), 0.1f),
-        //         (new Vector3(65, 45, 25), 0.1f),
-        //         (new Vector3(-35, 10, 18), 0.1f)
-        //     }}
-        // };
+        
 
         // Start the coroutine to spawn objects every 5 seconds
         StartCoroutine(SpawnObjectsEveryFiveSeconds());
@@ -100,7 +84,7 @@ public class ObjectSpawner : MonoBehaviour
         while (true)
         {
             SpawnObjects();  // Place the objects
-            yield return new WaitForSeconds(1000f);  // Wait for 5 seconds before placing again
+            yield return new WaitForSeconds(10f);  // Wait for 5 seconds before placing again
         }
     }
 
