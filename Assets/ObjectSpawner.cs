@@ -8,48 +8,27 @@ public class ObjectSpawner : MonoBehaviour
     public GameObject[] sceneObjects;
     // Road object. Used mainly to get field where objects may be placed.
     public GameObject road;
+
+    public ObjectMaterialRandomizer objectRandomizer;
     // Gets size of the road in Vector3 coordinates.
     private Vector3 roadSize;
     // Minimum number of objects to be generated
-    private int minObjects = 100;
+    public int minObjects = 100;
     // Maximum number of objects to be generated
-    private int maxObjects = 200;
-    private int gridRows = 5;
-    private int gridColumns = 3;
+    public int maxObjects = 200;
+    private int gridRows = 10;
+    private int gridColumns = 6;
     private float gridCellWidth;
     private float gridCellHeight;
     private int objectsToBePlaced;
 
     private Dictionary<int, List<Vector3>> gridContainers;
     private Dictionary<int, float> objectOffsets;
-    private Dictionary<int, List<(Vector3 rotation, float yOffset)>> objectRotations = new Dictionary<int, List<(Vector3, float)>> 
-    {
-        {0, new List<(Vector3, float)> { //footballs
-            (new Vector3(0, 0, 0), 0f),
-            (new Vector3(0, 45, 0), 0f),
-            (new Vector3(0, 90, 0), 0f),
-            (new Vector3(0, 135, 0), 0f),
-            (new Vector3(0, 180, 0), 0f),
-            (new Vector3(0, 225, 0), 0f),
-            (new Vector3(0, 270, 0), 0f),
-            (new Vector3(0, 315, 0), 0f)
-        }},
-        {3, new List<(Vector3, float)> { //bikes
-            (new Vector3(65, 40, 0), 2.9f),
-            (new Vector3(-65, 90, 0), 2.9f),
-            (new Vector3(78, 135, 0), 2.9f),
-            //(new Vector3(-78, 180, 0), 2.9f),
-            (new Vector3(25, 220, 0), 4.5f),
-            (new Vector3(-25, 270, 0), 4.5f)
-        }},
-        {4, new List<(Vector3, float)> { //stop-sign
-            (new Vector3(85, 90, 40), 0.1f),
-            (new Vector3(-45, 130, 66), 0.1f),
-            (new Vector3(50, 160, 12), 0.1f),
-            (new Vector3(65, 45, 25), 0.1f),
-            (new Vector3(-35, 10, 18), 0.1f)
-        }}
-    };
+    private Dictionary<int, List<(Vector3 rotation, float yOffset)>> objectRotations;
+
+    private bool isCapturingFrame = false;
+
+    // private Dictionary<int, List<(Color color)>> objectColors;
 
     void Start()
     {
@@ -66,11 +45,134 @@ public class ObjectSpawner : MonoBehaviour
             gridContainers[i] = new List<Vector3>();
         }
         objectOffsets = new Dictionary<int, float>{
-            {0,-0.27f}, // Y Offset for football
-            {1,0.4f}, // Y Offset for basketball
-            {2,-0.9f}, // Y Offset for baseball
-            {3,4.6f}, // Y Offset for bikes
-            {4,0.6f}, // Y Offset for stop sign (no pole)
+            {0,1.35f}, // Y Offset for football
+            {1,1.62f}, // Y Offset for Soccerball
+            {2,1.95f}, // Y Offset for basketball
+            {3,1.65f}, // Y Offset for basketball
+            // {2,-0.9f}, // Y Offset for baseball
+            // {2,4.6f}, // Y Offset for bikes
+            {4,0.1f}, // Y Offset for stop sign (no pole)
+            // {4,0f}, // Y Offset for Airplane
+            {5,1.2f}, // Y Offset for Car
+            // {6,0.2f}, // Y Offset for Clock
+            {6,0.9f}, // Y Offset for Closed Umbrella
+            {7,0.35f}, // Y Offset for Tennis Racket
+            // {7,0.9f}, // Y Offset for Baseball Bat
+            {8,1.8f}, // Y Offset for Suitcase Large
+            {9,1.5f}, // Y Offset for Suitcase Medium
+        };
+        objectRotations = new Dictionary<int, List<(Vector3, float)>> 
+        {
+            {0, new List<(Vector3, float)> { //footballs
+                (new Vector3(0, 0, 0), 1.35f),
+                (new Vector3(0, 45, 0), 1.35f),
+                (new Vector3(0, 90, 0), 1.35f),
+                (new Vector3(0, 135, 0), 1.35f),
+                (new Vector3(0, 180, 0), 1.35f),
+                (new Vector3(0, 225, 0), 1.35f),
+                (new Vector3(0, 270, 0), 1.35f),
+                (new Vector3(0, 315, 0), 1.35f)
+            }},
+            {1, new List<(Vector3, float)> { // soccerballs 
+                (new Vector3(0, 0, 0), 1.62f),
+                (new Vector3(10, 45, -30), 1.62f),
+                (new Vector3(-15, 90, 25), 1.62f),
+                (new Vector3(20, -135, -10), 1.62f),
+                (new Vector3(5, 180, 60), 1.62f),
+                (new Vector3(-20, -225, 45), 1.62f),
+                (new Vector3(35, 270, -15), 1.62f),
+                (new Vector3(-40, 315, 20), 1.62f)
+            }},
+            // {2, new List<(Vector3, float)> { //bikes
+            //     (new Vector3(65, 40, 0), 2.9f),
+            //     (new Vector3(-65, 90, 0), 2.9f),
+            //     (new Vector3(78, 135, 0), 2.9f),
+            //     //(new Vector3(-78, 180, 0), 2.9f),
+            //     (new Vector3(25, 220, 0), 5.7f),
+            //     (new Vector3(-25, 270, 0), 5.7f)
+            // }},
+            {2, new List<(Vector3, float)> { // Basketballs 
+                (new Vector3(0, 0, 0), 1.95f),
+                (new Vector3(10, 45, -30), 1.95f),
+                (new Vector3(-15, 90, 25), 1.95f),
+                (new Vector3(20, -135, -10), 1.95f),
+                (new Vector3(5, 180, 60), 1.95f),
+                (new Vector3(-20, -225, 45), 1.95f),
+                (new Vector3(35, 270, -15), 1.95f),
+                (new Vector3(-40, 315, 20), 1.95f)
+            }},
+            {3, new List<(Vector3, float)> { // volleyballs
+                (new Vector3(0, 0, 0), 1.65f),
+                (new Vector3(10, 45, -30), 1.65f),
+                (new Vector3(-15, 90, 25), 1.65f),
+                (new Vector3(20, -135, -10), 1.65f),
+                (new Vector3(5, 180, 60), 1.65f),
+                (new Vector3(-20, -225, 45), 1.65f),
+                (new Vector3(35, 270, -15), 1.65f),
+                (new Vector3(-40, 315, 20), 1.65f)
+            }},
+            {4, new List<(Vector3, float)> { //Stop Sign
+                (new Vector3(270, 90, 0), 0.1f),
+                (new Vector3(270, 130, 0), 0.1f),
+                (new Vector3(270, 160, 0), 0.1f),
+                (new Vector3(270, 45, 0), 0.1f),
+                
+            }},
+            // {4, new List<(Vector3, float)> { //airplane
+            //     (new Vector3(0, 90, 0), 0.1f),
+            //     (new Vector3(0, 130, 0), 0.1f),
+            //     (new Vector3(0, 160, 0), 0.1f),
+            //     (new Vector3(0, 45, 0), 0.1f),
+            //     (new Vector3(6, 0, 180), 1.3f)
+            // }},
+            {5, new List<(Vector3, float)> { // Toy Car
+                (new Vector3(0, 0, 0), 1.2f),
+                (new Vector3(0, 90, 0), 1.2f),
+                (new Vector3(0, 180, 0), 1.2f),
+                (new Vector3(0, 270, 0), 1.2f),
+            }},
+            // {6, new List<(Vector3, float)> { // Clock
+            //     (new Vector3(0, 0, 0), 0.2f),
+            //     (new Vector3(0, 90, 0), 0.2f),
+            //     (new Vector3(0, 180, 0), 0.2f),
+            //     (new Vector3(0, 270, 0), 0.2f),
+            // }},
+            {6, new List<(Vector3, float)> { // Umbrella
+                (new Vector3(0, 0, 90), 0.2f),
+                (new Vector3(0, 90, 90), 0.2f),
+                (new Vector3(0, 180, 90), 0.2f),
+                (new Vector3(0, 270, 90), 0.2f),
+            }},
+            // {7, new List<(Vector3, float)> { // Baseball Bat
+            //     (new Vector3(0, 0, 90), 0.7f),
+            //     (new Vector3(0, 90, 90), 0.7f),
+            //     (new Vector3(0, 180, 90), 0.7f),
+            //     (new Vector3(0, 270, 90), 0.7f),
+            // }},
+            {7, new List<(Vector3, float)> { // Tennis Racket
+                (new Vector3(90, 0, 0), 0.35f),
+                (new Vector3(90, 90, 0), 0.35f),
+                (new Vector3(90, 180, 0), 0.35f),
+                (new Vector3(90, 270, 0), 0.35f),
+                (new Vector3(90, 45, 0), 0.35f),
+                (new Vector3(90, 135, 0), 0.35f),
+                (new Vector3(90, 225, 0), 0.35f),
+                (new Vector3(90, 315, 0), 0.35f),
+                (new Vector3(90, 60, 0), 0.35f),
+                (new Vector3(90, 300, 0), 0.35f)
+            }},
+            {8, new List<(Vector3, float)> { // Suitcase Large
+                (new Vector3(0, 0, 0), 1.8f),
+                (new Vector3(0, 90, 0), 1.8f),
+                (new Vector3(0, 180, 0), 1.8f),
+                (new Vector3(0, 270, 0), 1.8f),
+            }},
+            {9, new List<(Vector3, float)> { // Suitcase Medium
+                (new Vector3(0, 0, 0), 1.5f),
+                (new Vector3(0, 90, 0), 1.5f),
+                (new Vector3(0, 180, 0), 1.5f),
+                (new Vector3(0, 270, 0), 1.5f),
+            }},
         };
 
         
@@ -83,9 +185,20 @@ public class ObjectSpawner : MonoBehaviour
     {
         while (true)
         {
-            SpawnObjects();  // Place the objects
-            yield return new WaitForSeconds(10f);  // Wait for 5 seconds before placing again
+            // Wait until the camera is done capturing
+            while (isCapturingFrame)
+            {
+                yield return null; // Keep waiting until the capture finishes
+            }
+
+            SpawnObjects(); // Place the objects
+            yield return new WaitForSeconds(2); // Wait before running again
         }
+    }
+
+    public void SetCaptureFlag(bool value)
+    {
+        isCapturingFrame = value;
     }
 
     public void SpawnObjects()
@@ -159,9 +272,16 @@ public class ObjectSpawner : MonoBehaviour
 
         spawnPosition.y += yOffset;
         GameObject newObject = Instantiate(selectedObject, spawnPosition, rotation);
+        
         newObject.transform.parent = transform;
 
         gridContainers[gridIndex].Add(spawnPosition);
+
+        // Randomize albedo for the new object
+        if (objectRandomizer != null)
+        {
+            objectRandomizer.RandomizeObjectAlbedo(newObject);
+        }
 
         ///////////
         
@@ -193,7 +313,7 @@ public class ObjectSpawner : MonoBehaviour
         float xPos = road.transform.position.x - (roadSize.x / 2) + (col * gridCellWidth) + (gridCellWidth / 2);
         float zPos = road.transform.position.z - (roadSize.z / 2) + (row * gridCellHeight) + (gridCellHeight / 2);
 
-        return new Vector3(xPos, road.transform.position.y + 1.5f, zPos);
+        return new Vector3(xPos, road.transform.position.y, zPos);
     }
 
     private Vector3 GetRandomPositionWithinGrid(Vector3 gridCenter)

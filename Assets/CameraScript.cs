@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using System.Linq;
@@ -7,21 +8,25 @@ using System.Linq;
 public class CameraScript : MonoBehaviour
 {
     public GameObject sun;
+
+    public GameObject objectSpawner;
+
+    public RoadRandomizer road;
+
     private Camera cam;
     private System.Random rnd;
 
-    public GameObject objectSpawner;
+    private bool isCapturing = false;
+    
     public static int picturesTaken = 0;
     
-    readonly public static int totalpics = 100;
+    public int totalpics = 100;
     readonly private Vector2 AspectRatio = new Vector2(1920, 1080);
 
 
     const string workingDirectory = @"D:\Data\Buckeye Vertical\Image Classifier"; 
     //const string workingDirectory = "U:\\Prelim Detection Dataset";
 
-    public static Boolean swapPage = false;
-    public static Boolean swapRoad = false;
 
     private int fileCount = 0;
     private int prevFileCount = 0;
@@ -161,31 +166,49 @@ public class CameraScript : MonoBehaviour
     //Returns width and height of a  gameobject as a Vector2 Object
     private Vector2 GetWidthHeight(Bounds b)
     {
-        // Renderer rend = obj.GetComponent<Renderer>();
+        // Initialize an array to hold the 8 corners of the bounds
+        Vector3[] worldCorners = new Vector3[8];
 
-        // if(rend == null)
-        // {
-        //     Debug.LogWarning("Renderer not found on object!");
-        //     return Vector2.zero;
-        // }
+        // Get all 8 corners of the bounds in world space
+        worldCorners[0] = new Vector3(b.min.x, b.min.y, b.min.z);
+        worldCorners[1] = new Vector3(b.max.x, b.min.y, b.min.z);
+        worldCorners[2] = new Vector3(b.min.x, b.max.y, b.min.z);
+        worldCorners[3] = new Vector3(b.max.x, b.max.y, b.min.z);
+        worldCorners[4] = new Vector3(b.min.x, b.min.y, b.max.z);
+        worldCorners[5] = new Vector3(b.max.x, b.min.y, b.max.z);
+        worldCorners[6] = new Vector3(b.min.x, b.max.y, b.max.z);
+        worldCorners[7] = new Vector3(b.max.x, b.max.y, b.max.z);
 
-        // Bounds b = GetComponent<Renderer>().bounds;
+        // Convert each corner to screen space
+        Vector2[] screenCorners = new Vector2[8];
+        for (int i = 0; i < worldCorners.Length; i++)
+        {
+            Vector3 screenPoint = cam.WorldToScreenPoint(worldCorners[i]);
+            screenPoint.y = AspectRatio.y - screenPoint.y; // Adjust for screen origin
+            screenCorners[i] = new Vector2(screenPoint.x, screenPoint.y);
+        }
 
-        Vector3 minXZ = new Vector3(b.min.x, 0, b.min.z);
-        Vector3 maxXZ = new Vector3(b.max.x, 0, b.max.z);
+        // Find the min and max points in screen space
+        float minX = screenCorners[0].x;
+        float minY = screenCorners[0].y;
+        float maxX = screenCorners[0].x;
+        float maxY = screenCorners[0].y;
 
-        // Convert these modified min and max points to screen space
-        Vector2 minScreenPoint = cam.WorldToScreenPoint(minXZ);
-        Vector2 maxScreenPoint = cam.WorldToScreenPoint(maxXZ);
+        for (int i = 1; i < screenCorners.Length; i++)
+        {
+            minX = Mathf.Min(minX, screenCorners[i].x);
+            minY = Mathf.Min(minY, screenCorners[i].y);
+            maxX = Mathf.Max(maxX, screenCorners[i].x);
+            maxY = Mathf.Max(maxY, screenCorners[i].y);
+        }
 
-        minScreenPoint.y = AspectRatio.y - minScreenPoint.y;
-        maxScreenPoint.y = AspectRatio.y - maxScreenPoint.y;
+        // Calculate width and height in screen space
+        float width = Mathf.Abs(maxX - minX) * 1.2f; // Add padding
+        float height = Mathf.Abs(maxY - minY) * 1.2f;
 
-        float width = Mathf.Abs(maxScreenPoint.x - minScreenPoint.x)*1.2f;
-        float height = Mathf.Abs(maxScreenPoint.y - minScreenPoint.y)*1.2f;
-        return new Vector2(width,height);
-    } 
-    //TO-DO: Write a formula based on the rotation of the object compared to the object to make it bigger
+        return new Vector2(width, height);
+    }
+
     private Bounds CalculateCombinedBounds(GameObject obj)
     {
         Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
@@ -238,75 +261,101 @@ public class CameraScript : MonoBehaviour
         // Initialize the dictionary with mappings
         objectClassMap = new Dictionary<string, int>
         {
-            { "Basketball", 0 },
-            { "Football", 1 },
-            { "BMXBikeE", 2 },
-            { "Sign_Stop", 3 },
-            { "Baseball", 4 },
-            // Add other objects as needed
+            { "Football", 0 },
+            { "Soccerball", 1 },
+            { "Basketball", 2 },
+            { "Volleyball", 3 },
+            { "Sign_Stop", 4 },
+            { "ScaleCar", 5 },
+            // { "(Prb)Clock", 6 },
+            { "Closed Umbrella", 6 },
+            { "Tennis Racket", 7 },
+            // { "Mob_Baseball_Bat_10", 7 },
+            { "TravelSet_Suitcase", 8 },
+            { "TravelSet_Suitcase Medium", 9 },
+            
         };
     }
 
 
     
+
+
     void Update()
     {
-        if (picturesTaken <= totalpics){
+        if (picturesTaken <= totalpics)
+        {
+            if (!isCapturing) // Only proceed if not already capturing
+            {
+                isCapturing = true; // Prevent new captures until finished
+                
+                // Apply new materials (road and environment)
+                if (road != null)
+                {
+                    Debug.Log("road changed");
+                    road.ApplyMaterial();
+                }
                 randomizeSun();
                 randomizeCamera();
+                
+                // Find valid targets
                 (GameObject gameObject, Bounds bounds)[] targets = validTargets();
-
-                if(targets.Length > 0){
-
-                    string textToWrite = GenerateNormalizedDataString(targets);
-                    string screenShotPath;
-                    string filePath;
-
-                    //Every four pictures sent to train set
-                    if (picturesTaken % 5 != 0)
-                    {
-                        screenShotPath = workingDirectory + "\\train\\images\\" + picturesTaken.ToString() + ".png";
-                        filePath = workingDirectory + "/train/labels/" + picturesTaken.ToString() + ".txt";
-                    }
-                    //Every fifth picture sent to validation set
-                    else
-                    {
-                        screenShotPath = workingDirectory + "\\valid\\images\\"  + picturesTaken.ToString() + ".png";
-                        filePath = workingDirectory + "/valid/labels/" + picturesTaken.ToString() + ".txt";
-                    }
-
-                    // Debug.Log(workingDirectory + "\\valid\\images\\"  + prevPicTaken.ToString() + ".png");
-
-                    if(File.Exists(workingDirectory + "\\train\\images\\"+ prevPicTaken.ToString() + ".png") ||
-                    (prevPicTaken == -1) || File.Exists(workingDirectory + "\\valid\\images\\"+ prevPicTaken.ToString() + ".png"))
-                    {
-                        // Create a new StreamWriter and write the text to the file
-                        using (StreamWriter writer = new StreamWriter(filePath))
-                        {
-                            writer.WriteLine(textToWrite);
-                        }
-
-                        //CHANGE TO TRAIN
-                        ScreenCapture.CaptureScreenshot(screenShotPath);
-                        prevPicTaken = picturesTaken;
-                        prevFileCount = fileCount;
-                        
-                        picturesTaken++;
-                        
-                    }
+                if (targets.Length > 0)
+                {
+                    StartCoroutine(CaptureFrame(targets));
                 }
-            Debug.Log(picturesTaken);
-        }else{
+                else
+                {
+                    isCapturing = false; // Release flag if no targets found
+                }
+            }
+        }
+        else
+        {
             Debug.Log("Reached max count. Exiting application...");
             Application.Quit();
 
-            // If you're running in the Unity Editor, stop play mode
             #if UNITY_EDITOR
-                        UnityEditor.EditorApplication.isPlaying = false;
+                UnityEditor.EditorApplication.isPlaying = false;
             #endif
         }
-        
     }
+
+    private IEnumerator CaptureFrame((GameObject, Bounds)[] targets)
+{
+    string textToWrite = GenerateNormalizedDataString(targets);
+    string screenShotPath;
+    string filePath;
+
+    if (picturesTaken % 5 != 0)
+    {
+        screenShotPath = workingDirectory + "\\train\\images\\" + picturesTaken.ToString() + ".png";
+        filePath = workingDirectory + "/train/labels/" + picturesTaken.ToString() + ".txt";
+    }
+    else
+    {
+        screenShotPath = workingDirectory + "\\valid\\images\\" + picturesTaken.ToString() + ".png";
+        filePath = workingDirectory + "/valid/labels/" + picturesTaken.ToString() + ".txt";
+    }
+
+    // Write metadata to file
+    using (StreamWriter writer = new StreamWriter(filePath))
+    {
+        writer.WriteLine(textToWrite);
+    }
+
+    // Capture the screenshot at the end of the frame
+    yield return new WaitForEndOfFrame();
+    ScreenCapture.CaptureScreenshot(screenShotPath);
+
+    // Wait an extra frame to ensure completion
+    yield return null;
+
+    picturesTaken++;
+    prevPicTaken = picturesTaken;
+    isCapturing = false; // Release flag
+}
+
 
     
     

@@ -1,0 +1,21 @@
+Football is the baseline for sportsballs.
+
+Dim Football: 28 cm long
+Dim Soccerball: 23cm diameter
+Dim Basketball: 24cm diameter
+Dim Volleyball: 21cm diameter
+
+Since all balls are from the same package, as long they are the same scale, should be the same size
+
+Car is 1:8 Scale.
+Real Car 4.5 Meters long.
+Scale Car 56.25 centimeters long (2x Football)
+
+Regulation Stop Sign is 76x76 cm, 76cm long
+
+Elite Umbrella: 91 cm
+
+Large Suitcase: 76 cm
+Medium Suitcase: 67 cm
+
+Tennis Racket: 74 cm
