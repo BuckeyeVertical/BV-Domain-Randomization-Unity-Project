@@ -25,3 +25,5 @@ Dim Mannequin: 180 cm
 Dim Person: 180 cm
 
 Dim Bus: 152.4 cm
+
+Queen Bed: 203 cm
