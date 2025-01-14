@@ -273,6 +273,11 @@ public class CameraScript : MonoBehaviour
             // { "Mob_Baseball_Bat_10", 7 },
             { "TravelSet_Suitcase", 8 },
             { "TravelSet_Suitcase Medium", 9 },
+            { "Airplane", 10 },
+            { "Motorcycle", 11 },
+            { "mannequin", 12 },
+            { "person", 13 },
+            { "School Bus", 14 },
             
         };
     }

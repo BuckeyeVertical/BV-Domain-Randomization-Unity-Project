@@ -60,6 +60,11 @@ public class ObjectSpawner : MonoBehaviour
             // {7,0.9f}, // Y Offset for Baseball Bat
             {8,1.8f}, // Y Offset for Suitcase Large
             {9,1.5f}, // Y Offset for Suitcase Medium
+            {10, -1f}, // Y Offset for Plane
+            {11, 9.4f}, // Y Offset for Motorcycle
+            {12, 1.91f}, // Y Offset for Motorcycle
+            {13, 3.03f}, // Y Offset for Motorcycle
+            {14, 0f}, // Y Offset for Motorcycle
         };
         objectRotations = new Dictionary<int, List<(Vector3, float)>> 
         {
@@ -172,6 +177,36 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 90, 0), 1.5f),
                 (new Vector3(0, 180, 0), 1.5f),
                 (new Vector3(0, 270, 0), 1.5f),
+            }},
+            {10, new List<(Vector3, float)> { // Airplane
+                (new Vector3(0, 0, 0), -1f),
+                (new Vector3(0, 90, 0), -1f),
+                (new Vector3(0, 180, 0), -1f),
+                (new Vector3(0, 270, 0), -1f),
+            }},
+            {11, new List<(Vector3, float)> { // Motorcycle
+                (new Vector3(0, 0, 0), 9.4f),
+                (new Vector3(0, 90, 0), 9.4f),
+                (new Vector3(0, 180, 0), 9.4f),
+                (new Vector3(0, 270, 0), 9.4f),
+            }},
+            {12, new List<(Vector3, float)> { // Mannequin
+                (new Vector3(0, 0, 0), 1.91f),
+                (new Vector3(0, 90, 0), 1.91f),
+                (new Vector3(0, 180, 0), 1.91f),
+                (new Vector3(0, 270, 0), 1.91f),
+            }},
+            {13, new List<(Vector3, float)> { // Person
+                (new Vector3(0, 0, 0), 3.03f),
+                (new Vector3(0, 90, 0), 3.03f),
+                (new Vector3(0, 180, 0), 3.03f),
+                (new Vector3(0, 270, 0), 3.03f),
+            }},
+            {14, new List<(Vector3, float)> { // Bus
+                (new Vector3(0, 0, 0), 0f),
+                (new Vector3(0, 90, 0), 0f),
+                (new Vector3(0, 180, 0), 0f),
+                (new Vector3(0, 270, 0), 0f),
             }},
         };
 

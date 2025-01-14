@@ -19,3 +19,9 @@ Large Suitcase: 76 cm
 Medium Suitcase: 67 cm
 
 Tennis Racket: 74 cm
+
+Dim Mannequin: 180 cm
+
+Dim Person: 180 cm
+
+Dim Bus: 152.4 cm
