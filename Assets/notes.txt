@@ -22,6 +22,8 @@ Tennis Racket: 74 cm
 
 Dim Mannequin: 180 cm
 
+Dim Boat: 105 cm 
+
 Dim Person: 180 cm
 
 Dim Bus: 152.4 cm
