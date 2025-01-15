@@ -65,6 +65,13 @@ public class ObjectSpawner : MonoBehaviour
             {12, 1.91f}, // Y Offset for Motorcycle
             {13, 3.03f}, // Y Offset for Motorcycle
             {14, 0f}, // Y Offset for Motorcycle
+            {15,0.7f}, // Y Offset for Baseball Bat
+            {16,1.9f}, // Y Offset for Boat
+            {17,0.2f}, // Y Offset for Skis
+            {18,1f}, // Y Offset for Snowboard
+            {19,-0.4f}, // Y Offset for Bed-Frame
+            {20,-4.1f}, // Y Offset for Bed
+            
         };
         objectRotations = new Dictionary<int, List<(Vector3, float)>> 
         {
@@ -207,6 +214,45 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 90, 0), 0f),
                 (new Vector3(0, 180, 0), 0f),
                 (new Vector3(0, 270, 0), 0f),
+            }},
+            {15, new List<(Vector3, float)> { // Baseball Bat
+                (new Vector3(0, 0, 90), 0.7f),
+                (new Vector3(0, 90, 90), 0.7f),
+                (new Vector3(0, 180, 90), 0.7f),
+                (new Vector3(0, 270, 90), 0.7f),
+            }},
+            {16, new List<(Vector3, float)> { // Boat
+                (new Vector3(0, 0, 0), 1.9f),
+                (new Vector3(0, 90, 0), 1.9f),
+                (new Vector3(0, 180, 0), 1.9f),
+                (new Vector3(0, 270, 0), 1.9f),
+                (new Vector3(15, 270, 0), 1.8f),
+                (new Vector3(15, 189, 0), 1.8f),
+                (new Vector3(15, 90, 0), 1.8f),
+            }},
+            {17, new List<(Vector3, float)> { // Skis
+                (new Vector3(0, 0, 0), 0.2f),
+                (new Vector3(0, 90, 0), 0.2f),
+                (new Vector3(0, 180, 0), 0.2f),
+                (new Vector3(0, 270, 0), 0.2f),
+            }},
+            {18, new List<(Vector3, float)> { // Snowboard
+                (new Vector3(0, 0, 0), 1f),
+                (new Vector3(0, 90, 0), 1f),
+                (new Vector3(0, 180, 0), 1f),
+                (new Vector3(0, 270, 0), 1f),
+            }},
+            {19, new List<(Vector3, float)> { // Bed-Frame
+                (new Vector3(0, 0, 0), -0.4f),
+                (new Vector3(0, 90, 0), -0.4f),
+                (new Vector3(0, 180, 0), -0.4f),
+                (new Vector3(0, 270, 0), -0.4f),
+            }},
+            {20, new List<(Vector3, float)> { // Bed
+                (new Vector3(0, 0, 0), -4.1f),
+                (new Vector3(0, 90, 0), -4.1f),
+                (new Vector3(0, 180, 0), -4.1f),
+                (new Vector3(0, 270, 0), -4.1f),
             }},
         };
 
