@@ -278,6 +278,12 @@ public class CameraScript : MonoBehaviour
             { "mannequin", 12 },
             { "person", 13 },
             { "School Bus", 14 },
+            { "Bat", 15 },
+            { "Boat", 16 },
+            { "Skis", 17 },
+            { "Snowboard", 18 },
+            { "Bed-Frame", 19 },
+            { "Bed", 19 },
             
         };
     }
