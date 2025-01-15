@@ -26,4 +26,4 @@ Dim Person: 180 cm
 
 Dim Bus: 152.4 cm
 
-Queen Bed: 203 cm
+Full Sized Bed: 203 cm, but scaled to fit the person
