@@ -235,12 +235,7 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 180, 0), -0.4f),
                 (new Vector3(0, 270, 0), -0.4f),
             }},
-            {15, new List<(Vector3, float)> { // Bed
-                (new Vector3(0, 0, 0), 0f),
-                (new Vector3(0, 90, 0), 0f),
-                (new Vector3(0, 180, 0), 0f),
-                (new Vector3(0, 270, 0), 0f),
-            }},
+           
         };
 
         
