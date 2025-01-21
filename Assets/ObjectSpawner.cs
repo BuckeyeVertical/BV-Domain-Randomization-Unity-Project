@@ -326,22 +326,27 @@ public class ObjectSpawner : MonoBehaviour
         while (overlaps)
         {
             overlaps = false; // Assume no overlap initially
-
+            int tries = 0;
             if (gridContainers[gridIndex].Count > 0)
             {
                 // Check for overlaps within the grid container
                 foreach (Vector3 placedPosition in gridContainers[gridIndex])
                 {
-                    if (Vector3.Distance(spawnPosition, placedPosition) < 10f) // Adjust overlap threshold
+                    if (Vector3.Distance(spawnPosition, placedPosition) < 20f) // Adjust overlap threshold
                     {
                         overlaps = true;
+                        tries += 1;
                         break;
                     }
                 }
 
+                if (tries > 100){
+                    break;
+                }
                 // If overlapping, regenerate the spawn position within the same grid
                 if (overlaps)
                 {
+                    
                     spawnPosition = GetRandomPositionWithinGrid(gridCenter);
                 }
             }
