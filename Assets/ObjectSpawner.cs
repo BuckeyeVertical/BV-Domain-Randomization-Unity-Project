@@ -65,13 +65,6 @@ public class ObjectSpawner : MonoBehaviour
             {12, 1.91f}, // Y Offset for Motorcycle
             {13, 3.03f}, // Y Offset for Motorcycle
             {14, 0f}, // Y Offset for Motorcycle
-            {15,0.7f}, // Y Offset for Baseball Bat
-            {16,1.9f}, // Y Offset for Boat
-            {17,0.2f}, // Y Offset for Skis
-            {18,1f}, // Y Offset for Snowboard
-            {19,-0.4f}, // Y Offset for Bed-Frame
-            {20,-4.1f}, // Y Offset for Bed
-            
         };
         objectRotations = new Dictionary<int, List<(Vector3, float)>> 
         {
@@ -198,24 +191,16 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 270, 0), 9.4f),
             }},
             {12, new List<(Vector3, float)> { // Mannequin
-                // (new Vector3(0, 0, 0), 1.91f),
-                // (new Vector3(0, 90, 0), 1.91f),
-                // (new Vector3(0, 180, 0), 1.91f),
-                // (new Vector3(0, 270, 0), 1.91f),
-                (new Vector3(-90, 0, 90), 1.91f),
-                (new Vector3(-90, 90, 90), 1.91f),
-                (new Vector3(-90, 180, 90), 1.91f),
-                (new Vector3(-90, 270, 90), 1.91f),
+                (new Vector3(0, 0, 0), 1.91f),
+                (new Vector3(0, 90, 0), 1.91f),
+                (new Vector3(0, 180, 0), 1.91f),
+                (new Vector3(0, 270, 0), 1.91f),
             }},
             {13, new List<(Vector3, float)> { // Person
-                // (new Vector3(0, 0, 0), 3.03f),
-                // (new Vector3(0, 90, 0), 3.03f),
-                // (new Vector3(0, 180, 0), 3.03f),
-                // (new Vector3(0, 270, 0), 3.03f),
-                (new Vector3(-90, 0, 90), 3.03f),
-                (new Vector3(-90, 90, 90), 3.03f),
-                (new Vector3(-90, 180, 90), 3.03f),
-                (new Vector3(-90, 270, 90), 3.03f),
+                (new Vector3(0, 0, 0), 3.03f),
+                (new Vector3(0, 90, 0), 3.03f),
+                (new Vector3(0, 180, 0), 3.03f),
+                (new Vector3(0, 270, 0), 3.03f),
             }},
             {14, new List<(Vector3, float)> { // Bus
                 (new Vector3(0, 0, 0), 0f),
@@ -223,13 +208,7 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 180, 0), 0f),
                 (new Vector3(0, 270, 0), 0f),
             }},
-            {15, new List<(Vector3, float)> { // Baseball Bat
-                (new Vector3(0, 0, 90), 0.7f),
-                (new Vector3(0, 90, 90), 0.7f),
-                (new Vector3(0, 180, 90), 0.7f),
-                (new Vector3(0, 270, 90), 0.7f),
-            }},
-            {16, new List<(Vector3, float)> { // Boat
+            {15, new List<(Vector3, float)> { // Boat
                 (new Vector3(0, 0, 0), 1.9f),
                 (new Vector3(0, 90, 0), 1.9f),
                 (new Vector3(0, 180, 0), 1.9f),
@@ -256,12 +235,7 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 180, 0), -0.4f),
                 (new Vector3(0, 270, 0), -0.4f),
             }},
-            {20, new List<(Vector3, float)> { // Bed
-                (new Vector3(0, 0, 0), -4.1f),
-                (new Vector3(0, 90, 0), -4.1f),
-                (new Vector3(0, 180, 0), -4.1f),
-                (new Vector3(0, 270, 0), -4.1f),
-            }},
+           
         };
 
         
