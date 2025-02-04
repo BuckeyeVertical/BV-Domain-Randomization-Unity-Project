@@ -59,13 +59,13 @@ public class CameraScript : MonoBehaviour
 
     private void randomizeCamera()
     {
-        float x = rnd.Next(-60, 60);
+        float x = rnd.Next(-200, 200);
         float y = rnd.Next(150, 200);
-        float z = rnd.Next(-25, 25);
+        float z = rnd.Next(-50, 50);
         cam.transform.localPosition = new Vector3(x, y, z);
 
         float rotation_y = rnd.Next(0, 359);
-        float rotation_x = rnd.Next(90, 90);
+        float rotation_x = rnd.Next(88, 92);
         cam.transform.localRotation = Quaternion.Euler(rotation_x, rotation_y, 0);
     }
 
@@ -313,6 +313,7 @@ public class CameraScript : MonoBehaviour
                 (GameObject gameObject, Bounds bounds)[] targets = validTargets();
                 if (targets.Length > 0)
                 {
+                    
                     StartCoroutine(CaptureFrame(targets));
                 }
                 else
