@@ -191,16 +191,16 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 270, 0), 9.4f),
             }},
             {12, new List<(Vector3, float)> { // Mannequin
-                (new Vector3(0, 0, 0), 1.91f),
-                (new Vector3(0, 90, 0), 1.91f),
-                (new Vector3(0, 180, 0), 1.91f),
-                (new Vector3(0, 270, 0), 1.91f),
+                (new Vector3(-90, 0, 90), 1.91f),
+                (new Vector3(-90, 90, 90), 1.91f),
+                (new Vector3(-90, 180, 90), 1.91f),
+                (new Vector3(-90, 270, 90), 1.91f),
             }},
             {13, new List<(Vector3, float)> { // Person
-                (new Vector3(0, 0, 0), 3.03f),
-                (new Vector3(0, 90, 0), 3.03f),
-                (new Vector3(0, 180, 0), 3.03f),
-                (new Vector3(0, 270, 0), 3.03f),
+                (new Vector3(-90, 0, 90), 3.03f),
+                (new Vector3(-90, 90, 90), 3.03f),
+                (new Vector3(-90, 180, 90), 3.03f),
+                (new Vector3(-90, 270, 90), 3.03f),
             }},
             {14, new List<(Vector3, float)> { // Bus
                 (new Vector3(0, 0, 0), 0f),
@@ -208,7 +208,13 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 180, 0), 0f),
                 (new Vector3(0, 270, 0), 0f),
             }},
-            {15, new List<(Vector3, float)> { // Boat
+            {15, new List<(Vector3, float)> { // Baseball Bat
+                (new Vector3(0, 0, 90), 0.7f),
+                (new Vector3(0, 90, 90), 0.7f),
+                (new Vector3(0, 180, 90), 0.7f),
+                (new Vector3(0, 270, 90), 0.7f),
+            }},
+            {16, new List<(Vector3, float)> { // Boat
                 (new Vector3(0, 0, 0), 1.9f),
                 (new Vector3(0, 90, 0), 1.9f),
                 (new Vector3(0, 180, 0), 1.9f),
@@ -217,6 +223,7 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(15, 189, 0), 1.8f),
                 (new Vector3(15, 90, 0), 1.8f),
             }},
+            
             {17, new List<(Vector3, float)> { // Skis
                 (new Vector3(0, 0, 0), 0.2f),
                 (new Vector3(0, 90, 0), 0.2f),
@@ -235,7 +242,18 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 180, 0), -0.4f),
                 (new Vector3(0, 270, 0), -0.4f),
             }},
-           
+            {20, new List<(Vector3, float)> { // Bed
+                (new Vector3(0, 0, 0), -4.1f),
+                (new Vector3(0, 90, 0), -4.1f),
+                (new Vector3(0, 180, 0), -4.1f),
+                (new Vector3(0, 270, 0), -4.1f),
+            }},
+            {21, new List<(Vector3, float)> { // Bed
+                (new Vector3(40, 0, 0), 1f),
+                (new Vector3(40, 90, 0), 1f),
+                (new Vector3(40, 180, 0), 1f),
+                (new Vector3(40, 270, 0), 1f),
+            }},
         };
 
         
@@ -346,10 +364,10 @@ public class ObjectSpawner : MonoBehaviour
         gridContainers[gridIndex].Add(spawnPosition);
 
         // Randomize albedo for the new object
-        if (objectRandomizer != null)
-        {
-            objectRandomizer.RandomizeObjectAlbedo(newObject);
-        }
+        // if (objectRandomizer != null && randomIndex!=12)
+        // {
+        //     objectRandomizer.RandomizeObjectAlbedo(newObject);
+        // }
 
         ///////////
         

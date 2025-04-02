@@ -35,5 +35,6 @@ public class RoadRandomizer : MonoBehaviour
         if (count > 3){
             count = 0;
         }
+        //Debug.Log("Road Changed 2");
     }
 }

@@ -52,7 +52,7 @@ def add_noise_to_directory(input_dir, output_dir):
     print("Processing complete.")
 
 # Example usage: Adjust 'input_directory' and 'output_directory' to your paths
-input_directory = "E:\\Data\\Buckeye Vertical\\Image Classifier\\Mar26\\valid\\images"
-output_directory = "E:\\Data\\Buckeye Vertical\\Image Classifier\\Mar26\\valid\\imagesnoise"
+input_directory = "D:\\Data\\Buckeye Vertical\\Image Classifier\\train\\images"
+output_directory = "D:\\Data\\Buckeye Vertical\\Image Classifier\\train\\imagesnoise"
 
 add_noise_to_directory(input_directory, output_directory)
