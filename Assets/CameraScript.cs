@@ -309,6 +309,7 @@ public class CameraScript : MonoBehaviour
                 }
                 randomizeSun();
                 randomizeCamera();
+                WaitForSeconds(10000);
                 
                 // Find valid targets
                 (GameObject gameObject, Bounds bounds)[] targets = validTargets();

@@ -273,7 +273,7 @@ public class ObjectSpawner : MonoBehaviour
             }
 
             SpawnObjects(); // Place the objects
-            yield return new WaitForSeconds(2); // Wait before running again
+            yield return new WaitForSeconds(10000); // Wait before running again
         }
     }
 
