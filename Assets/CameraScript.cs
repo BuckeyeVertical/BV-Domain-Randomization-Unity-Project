@@ -7,6 +7,9 @@ using System.Linq;
 
 public class CameraScript : MonoBehaviour
 {
+    public float moveSpeed = 50f;
+    public float rotationSpeed = 70f;
+
     public GameObject sun;
 
     public GameObject objectSpawner;
@@ -290,48 +293,90 @@ public class CameraScript : MonoBehaviour
     }
 
 
-    
+    void HandleMovement()
+    {
+        Vector3 direction = Vector3.zero;
+
+        // Forward/backward
+        if (Input.GetKey(KeyCode.UpArrow)) direction += transform.forward;
+        if (Input.GetKey(KeyCode.DownArrow)) direction -= transform.forward;
+
+        // Left/right
+        if (Input.GetKey(KeyCode.LeftArrow)) direction -= transform.right;
+        if (Input.GetKey(KeyCode.RightArrow)) direction += transform.right;
+
+        // Up/down
+        if (Input.GetKey(KeyCode.O)) direction += transform.up;
+        if (Input.GetKey(KeyCode.P)) direction -= transform.up;
+
+        transform.position += direction.normalized * moveSpeed * Time.deltaTime;
+    }
+
+    void HandleRotation()
+    {
+        float pitch = 0f; // x-axis
+        float yaw = 0f;   // y-axis
+        float roll = 0f;  // z-axis
+
+        // Pitch
+        if (Input.GetKey(KeyCode.W)) pitch = 1f;
+        if (Input.GetKey(KeyCode.S)) pitch = -1f;
+
+        // Yaw
+        if (Input.GetKey(KeyCode.A)) yaw = -1f;
+        if (Input.GetKey(KeyCode.D)) yaw = 1f;
+
+        // Roll
+        if (Input.GetKey(KeyCode.Q)) roll = 1f;
+        if (Input.GetKey(KeyCode.E)) roll = -1f;
+
+        Vector3 rotation = new Vector3(pitch, yaw, roll) * rotationSpeed * Time.deltaTime;
+        transform.Rotate(rotation, Space.Self);
+    }
 
 
     void Update()
     {
-        if (picturesTaken <= totalpics)
-        {
-            if (!isCapturing) // Only proceed if not already capturing
-            {
-                isCapturing = true; // Prevent new captures until finished
+        HandleMovement();
+        HandleRotation();
+        // if (picturesTaken <= totalpics)
+        // {
+        //     if (!isCapturing) // Only proceed if not already capturing
+        //     {
+        //         isCapturing = true; // Prevent new captures until finished
                 
-                // Apply new materials (road and environment)
-                if (road != null)
-                {
-                    Debug.Log("road changed");
-                    road.ApplyMaterial();
-                }
-                randomizeSun();
-                randomizeCamera();
+        //         // Apply new materials (road and environment)
+        //         if (road != null)
+        //         {
+        //             // Debug.Log("road changed");
+        //             // road.ApplyMaterial();
+        //         }
+        //         // randomizeSun();
+        //         // randomizeCamera();
                 
-                // Find valid targets
-                (GameObject gameObject, Bounds bounds)[] targets = validTargets();
-                if (targets.Length > 0)
-                {
+                
+        //         // Find valid targets
+        //         (GameObject gameObject, Bounds bounds)[] targets = validTargets();
+        //         if (targets.Length > 0)
+        //         {
                     
-                    StartCoroutine(CaptureFrame(targets));
-                }
-                else
-                {
-                    isCapturing = false; // Release flag if no targets found
-                }
-            }
-        }
-        else
-        {
-            Debug.Log("Reached max count. Exiting application...");
-            Application.Quit();
+        //             StartCoroutine(CaptureFrame(targets));
+        //         }
+        //         else
+        //         {
+        //             isCapturing = false; // Release flag if no targets found
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     Debug.Log("Reached max count. Exiting application...");
+        //     Application.Quit();
 
-            #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-            #endif
-        }
+        //     #if UNITY_EDITOR
+        //         UnityEditor.EditorApplication.isPlaying = false;
+        //     #endif
+        // }
     }
 
     private IEnumerator CaptureFrame((GameObject, Bounds)[] targets)
@@ -354,12 +399,12 @@ public class CameraScript : MonoBehaviour
     // Write metadata to file
     using (StreamWriter writer = new StreamWriter(filePath))
     {
-        writer.WriteLine(textToWrite);
+        // writer.WriteLine(textToWrite);
     }
 
     // Capture the screenshot at the end of the frame
     yield return new WaitForEndOfFrame();
-    ScreenCapture.CaptureScreenshot(screenShotPath);
+    // ScreenCapture.CaptureScreenshot(screenShotPath);
 
     // Wait an extra frame to ensure completion
     yield return null;
