@@ -2063,6 +2063,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa5afd4a97705b144ac8121a229a0d7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 50
+  rotationSpeed: 70
   sun: {fileID: 705507993}
   objectSpawner: {fileID: 1755071321}
   road: {fileID: 609622175}

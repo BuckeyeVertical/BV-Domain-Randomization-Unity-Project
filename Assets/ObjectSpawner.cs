@@ -55,13 +55,13 @@ public class ObjectSpawner : MonoBehaviour
             // {4,0f}, // Y Offset for Airplane
             {5,1.2f}, // Y Offset for Car
             // {6,0.2f}, // Y Offset for Clock
-            {6,0.9f}, // Y Offset for Closed Umbrella
+            {6,0f}, // Y Offset for Closed Umbrella
             {7,0.35f}, // Y Offset for Tennis Racket
             // {7,0.9f}, // Y Offset for Baseball Bat
             {8,1.8f}, // Y Offset for Suitcase Large
             {9,1.5f}, // Y Offset for Suitcase Medium
             {10, -1f}, // Y Offset for Plane
-            {11, 9.4f}, // Y Offset for Motorcycle
+            {11, 8f}, // Y Offset for Motorcycle
             {12, 1.91f}, // Y Offset for Motorcycle
             {13, 3.03f}, // Y Offset for Motorcycle
             {14, 0f}, // Y Offset for Motorcycle
@@ -143,10 +143,10 @@ public class ObjectSpawner : MonoBehaviour
             //     (new Vector3(0, 270, 0), 0.2f),
             // }},
             {6, new List<(Vector3, float)> { // Umbrella
-                (new Vector3(0, 0, 90), 0.2f),
-                (new Vector3(0, 90, 90), 0.2f),
-                (new Vector3(0, 180, 90), 0.2f),
-                (new Vector3(0, 270, 90), 0.2f),
+                (new Vector3(0, 0, 90), -0.3f),
+                (new Vector3(0, 90, 90), -0.3f),
+                (new Vector3(0, 180, 90), -0.3f),
+                (new Vector3(0, 270, 90), -0.3f),
             }},
             // {7, new List<(Vector3, float)> { // Baseball Bat
             //     (new Vector3(0, 0, 90), 0.7f),
@@ -185,10 +185,10 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 270, 0), -1f),
             }},
             {11, new List<(Vector3, float)> { // Motorcycle
-                (new Vector3(0, 0, 0), 9.4f),
-                (new Vector3(0, 90, 0), 9.4f),
-                (new Vector3(0, 180, 0), 9.4f),
-                (new Vector3(0, 270, 0), 9.4f),
+                (new Vector3(0, 0, 0), 7.5f),
+                (new Vector3(0, 90, 0), 7.5f),
+                (new Vector3(0, 180, 0), 7.5f),
+                (new Vector3(0, 270, 0), 7.5f),
             }},
             {12, new List<(Vector3, float)> { // Mannequin
                 (new Vector3(-90, 0, 90), 1.91f),
@@ -248,7 +248,7 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 180, 0), -4.1f),
                 (new Vector3(0, 270, 0), -4.1f),
             }},
-            {21, new List<(Vector3, float)> { // Bed
+            {21, new List<(Vector3, float)> { // Open Umbrella
                 (new Vector3(40, 0, 0), 1f),
                 (new Vector3(40, 90, 0), 1f),
                 (new Vector3(40, 180, 0), 1f),
