@@ -185,10 +185,10 @@ public class ObjectSpawner : MonoBehaviour
                 (new Vector3(0, 270, 0), -1f),
             }},
             {11, new List<(Vector3, float)> { // Motorcycle
-                (new Vector3(0, 0, 0), 7.5f),
-                (new Vector3(0, 90, 0), 7.5f),
-                (new Vector3(0, 180, 0), 7.5f),
-                (new Vector3(0, 270, 0), 7.5f),
+                (new Vector3(0, 0, 0), 4.5f),
+                (new Vector3(0, 90, 0), 4.5f),
+                (new Vector3(0, 180, 0), 4.5f),
+                (new Vector3(0, 270, 0), 4.5f),
             }},
             {12, new List<(Vector3, float)> { // Mannequin
                 (new Vector3(-90, 0, 90), 1.91f),
